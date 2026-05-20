@@ -610,12 +610,6 @@ document.addEventListener('DOMContentLoaded', () => {
     bookingModal?.classList.remove('active');
   });
 
-  // Set dynamic thank you redirect URL for FormSubmit (bypassing CORS)
-  const formNextInput = document.getElementById('formsubmit-next') as HTMLInputElement | null;
-  if (formNextInput) {
-    formNextInput.value = window.location.origin + window.location.pathname + '?submitted=true#contact';
-  }
-
   // Check if form was just successfully submitted via redirect
   if (window.location.search.includes('submitted=true')) {
     alert('Thank you for contacting PostyBridges! We have received your car service specifications and an automotive electrical technician will reach out to you shortly.');
@@ -624,12 +618,56 @@ document.addEventListener('DOMContentLoaded', () => {
     window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
   }
 
-  // Loading state feedback on button click before submission redirect
-  contactFormElement?.addEventListener('submit', () => {
+  // Resilient form submission using the serverless email API
+  contactFormElement?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
     const submitBtn = contactFormElement.querySelector('button[type="submit"]') as HTMLButtonElement | null;
+    const statusMessage = document.getElementById('contact-form-status');
+
     if (submitBtn) {
       submitBtn.disabled = true;
       submitBtn.innerHTML = 'Sending...';
+    }
+
+    if (statusMessage) {
+      statusMessage.textContent = '';
+      statusMessage.classList.remove('error');
+      statusMessage.classList.remove('success');
+    }
+
+    try {
+      const formData = new FormData(contactFormElement);
+      const payload = Object.fromEntries(formData.entries());
+
+      const response = await fetch(contactFormElement.action, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        throw new Error(errorBody.error || `Form submission failed with status ${response.status}`);
+      }
+
+      if (statusMessage) {
+        statusMessage.textContent = 'Message sent successfully. Thank you!';
+        statusMessage.classList.add('success');
+      }
+      contactFormElement.reset();
+    } catch (error) {
+      if (statusMessage) {
+        statusMessage.textContent = 'The contact service is temporarily unavailable. Please email postybridges@gmail.com directly or try again later.';
+        statusMessage.classList.add('error');
+      }
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Send Message';
+      }
+      console.error('Contact form submission failed:', error);
     }
   });
 
@@ -642,11 +680,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const savedTheme = localStorage.getItem('theme') || 'dark';
   document.documentElement.setAttribute('data-theme', savedTheme);
 
+  const themeToggleLabel = themeToggle?.querySelector('.toggle-text');
+  const setThemeLabel = (theme: string) => {
+    if (themeToggleLabel) {
+      themeToggleLabel.textContent = theme === 'light' ? 'Dark mode' : 'Light mode';
+    }
+  };
+
+  setThemeLabel(savedTheme);
+
   themeToggle?.addEventListener('click', () => {
     const currentTheme = document.documentElement.getAttribute('data-theme');
     const newTheme = currentTheme === 'light' ? 'dark' : 'light';
     
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
+    setThemeLabel(newTheme);
   });
 });

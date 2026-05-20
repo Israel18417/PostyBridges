@@ -3,9 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PostyBridges | Premium Vehicle Tech Upgrades & GPS Tracking</title>
-    <meta name="description" content="Upgrade your ride with PostyBridges. We specialize in real-time GPS tracking, speed limit installation, high-end dash cams, Android system installations, and push-to-start upgrades." />
+    <title>PostyBridges | Automotive Technology, GPS Tracking & Security</title>
+    <meta name="description" content="PostyBridges provides premium automotive technology upgrades, GPS tracking, and vehicle connectivity solutions for modern cars." />
     <link rel="stylesheet" href="/src/style.css" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="mask-icon" href="/favicon.svg" color="#863bff" />
+    <link rel="apple-touch-icon" href="/logo.jpg" />
+    <meta name="theme-color" content="#863bff" />
   </head>
   <body>
     <!-- Background Glows -->
@@ -17,6 +22,7 @@
       <div class="nav-container">
         <a href="#" class="logo">
           <img src="/logo.jpg" alt="PostyBridges Logo" class="logo-img" />
+          <span class="logo-text">PostyBridges</span>
         </a>
         <nav>
           <ul class="nav-links" id="nav-links">
@@ -26,12 +32,15 @@
             <li><a href="#why-us" data-sec="why-us">Why Us</a></li>
             <li><a href="#faq" data-sec="faq">FAQs</a></li>
             <li><a href="#contact" data-sec="contact">Contact</a></li>
+            <li class="theme-toggle-item">
+              <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle theme">
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                <span class="toggle-text">Dark mode</span>
+              </button>
+            </li>
           </ul>
         </nav>
-        <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle theme">
-          <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-          <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        </button>
         <button class="btn-nav" id="btn-header-quote">Get Free Quote</button>
         <button class="hamburger" id="hamburger-menu" aria-label="Toggle menu">
           <span></span>
@@ -44,17 +53,17 @@
     <!-- Hero Section -->
     <section class="hero-section" id="hero">
       <div class="hero-content">
-        <span class="section-tag">Next-Gen Vehicle Integration</span>
-        <h1>Elevate Your <span class="text-gradient">Vehicle's Intelligence</span></h1>
-        <p>PostyBridges delivers state-of-the-art tech integrations for your car. From advanced real-time GPS tracking and dash cams to modern infotainment systems and keyless smart push-starts.</p>
+        <span class="section-tag">Professional Automotive Technology</span>
+        <h1>Transform your vehicle into a <span class="text-gradient">smarter, safer drive</span></h1>
+        <p>PostyBridges delivers precision vehicle technology with expert installation and trusted support. From advanced GPS tracking and premium dash cams to intelligent infotainment and push-to-start systems, we help modernize your ride with reliability and style.</p>
         <div class="hero-buttons">
-          <button class="btn-primary" id="btn-explore">Explore Upgrades</button>
-          <button class="btn-secondary" id="btn-estimate">Calculate Cost</button>
+          <button class="btn-primary" id="btn-explore">View Services</button>
+          <button class="btn-secondary" id="btn-estimate">Request Quote</button>
         </div>
       </div>
       <div class="hero-visual">
         <div class="hero-image-wrapper pulse-glow">
-          <img src="/public/hero-car.png" alt="Futuristic glowing connected car dashboard and tech systems" class="hero-image" />
+          <img src="/hero-car.png" alt="Futuristic glowing connected car dashboard and tech systems" class="hero-image" />
         </div>
         <!-- Floating Badges -->
         <div class="floating-badge badge-1">
@@ -90,7 +99,7 @@
         <!-- Service 1: GPS Vehicle Tracking -->
         <div class="service-card" data-service="tracking">
           <div class="service-card-image">
-            <img src="/public/tracking.png" alt="Real-time vehicle GPS tracking interface dashboard on mobile phone" />
+            <img src="/tracking.png" alt="Real-time vehicle GPS tracking interface dashboard on mobile phone" />
           </div>
           <h3>GPS Vehicle Tracking <span>Active</span></h3>
           <p>Real-time location monitoring, geofencing parameters, remote engine shutdown, and detailed travel history logs accessible on your mobile devices.</p>
@@ -609,12 +618,7 @@
 
         <div class="contact-form-wrapper">
           <h3 style="margin-bottom: 24px; font-size: 1.5rem;">Send Technical Message</h3>
-          <form class="contact-form" id="contact-form-element" action="https://formsubmit.co/postybridges@gmail.com" method="POST">
-            <!-- FormSubmit Configurations -->
-            <input type="hidden" name="_captcha" value="false" />
-            <input type="hidden" name="_subject" value="New Service Upgrade Inquiry - PostyBridges" />
-            <input type="hidden" name="_next" id="formsubmit-next" value="" />
-
+          <form class="contact-form" id="contact-form-element" action="/api/contact" method="POST">
             <div class="form-group">
               <label for="contact-name">Full Name</label>
               <input type="text" id="contact-name" name="name" class="input-field" placeholder="John Doe" required />
@@ -638,6 +642,7 @@
             <div class="form-group full-width" style="margin-bottom: 0;">
               <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">Send Message</button>
             </div>
+            <div id="contact-form-status" class="form-status"></div>
           </form>
         </div>
       </div>
