@@ -616,4 +616,21 @@ document.addEventListener('DOMContentLoaded', () => {
     alert('Thank you for contacting PostyBridges! We have received your car service specifications and an automotive electrical technician will reach out to you shortly.');
     contactFormElement.reset();
   });
+
+  // ==========================================
+  // Light / Dark Theme Toggle Logic
+  // ==========================================
+  const themeToggle = document.getElementById('theme-toggle');
+  
+  // Check for saved theme preference, default to dark
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+
+  themeToggle?.addEventListener('click', () => {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+  });
 });

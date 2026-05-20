@@ -33,6 +33,32 @@
   --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Day (Light) Mode Variables */
+[data-theme="light"] {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f1f5f9;
+  
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(15, 23, 42, 0.08);
+  --glass-border-hover: rgba(0, 240, 255, 0.4);
+  --glass-glow: rgba(0, 240, 255, 0.06);
+  --glass-glow-purple: rgba(157, 78, 221, 0.08);
+}
+
+/* Smooth transitions for theme switching */
+body, header, .service-card, .stats-card, .testimonial-card, .estimator-board, .contact-card, .contact-form-wrapper, .faq-item, .modal-content, .input-field {
+  transition: background-color var(--transition-normal), border-color var(--transition-normal), box-shadow var(--transition-normal), color var(--transition-normal);
+}
+
+[data-theme="light"] .glow-bg {
+  opacity: 0.12;
+}
+
 /* Reset and Global Styles */
 * {
   margin: 0;
@@ -160,7 +186,7 @@ header.scrolled {
   align-items: center;
   gap: 8px;
   text-decoration: none;
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .logo-dot {
@@ -176,7 +202,59 @@ header.scrolled {
   width: auto;
   object-fit: contain;
   display: block;
-  transition: height 0.3s ease;
+  transition: height 0.3s ease, filter 0.3s ease;
+}
+
+[data-theme="light"] .logo-img {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+  margin-right: 16px;
+}
+
+.theme-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--accent-cyan);
+}
+
+[data-theme="light"] .theme-toggle-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.theme-toggle-btn svg {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-toggle-btn:active svg {
+  transform: rotate(45deg);
+}
+
+/* Toggle icons visibility */
+[data-theme="light"] .theme-toggle-btn .sun-icon {
+  display: none;
+}
+[data-theme="light"] .theme-toggle-btn .moon-icon {
+  display: block;
+}
+
+.theme-toggle-btn .sun-icon {
+  display: block;
+}
+.theme-toggle-btn .moon-icon {
+  display: none;
 }
 
 .nav-links {
@@ -1283,10 +1361,14 @@ section {
   border: 1px solid var(--glass-border);
   border-radius: 10px;
   padding: 12px 16px;
-  color: #ffffff;
+  color: var(--text-primary);
   font-family: var(--font-body);
   font-size: 0.95rem;
   transition: var(--transition-fast);
+}
+
+[data-theme="light"] .input-field {
+  background: rgba(0, 0, 0, 0.02);
 }
 
 .input-field:focus {
@@ -1302,7 +1384,7 @@ textarea.input-field {
 
 /* Footer */
 footer {
-  background: #040508;
+  background: var(--bg-secondary);
   border-top: 1px solid var(--glass-border);
   padding: 80px 24px 30px;
 }
