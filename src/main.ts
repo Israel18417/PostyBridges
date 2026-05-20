@@ -610,11 +610,57 @@ document.addEventListener('DOMContentLoaded', () => {
     bookingModal?.classList.remove('active');
   });
 
-  // Contact Form Submission handler
-  contactFormElement?.addEventListener('submit', (e) => {
+  // Contact Form Submission handler (sending email via Formsubmit AJAX API)
+  contactFormElement?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    alert('Thank you for contacting PostyBridges! We have received your car service specifications and an automotive electrical technician will reach out to you shortly.');
-    contactFormElement.reset();
+    
+    const submitBtn = contactFormElement.querySelector('button[type="submit"]') as HTMLButtonElement | null;
+    const originalText = submitBtn ? submitBtn.innerHTML : 'Send Message';
+    
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = 'Sending...';
+    }
+
+    const nameVal = (document.getElementById('contact-name') as HTMLInputElement)?.value;
+    const emailVal = (document.getElementById('contact-email') as HTMLInputElement)?.value;
+    const phoneVal = (document.getElementById('contact-phone') as HTMLInputElement)?.value;
+    const vehicleVal = (document.getElementById('contact-vehicle') as HTMLInputElement)?.value;
+    const messageVal = (document.getElementById('contact-message') as HTMLTextAreaElement)?.value;
+
+    try {
+      const response = await fetch('https://formsubmit.co/ajax/postybridges@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          name: nameVal,
+          email: emailVal,
+          phone: phoneVal,
+          vehicle: vehicleVal,
+          message: messageVal
+        })
+      });
+
+      const data = await response.json();
+      
+      if (response.ok && data.success === 'true') {
+        alert('Thank you for contacting PostyBridges! We have received your car service specifications and an automotive electrical technician will reach out to you shortly.');
+        contactFormElement.reset();
+      } else {
+        throw new Error(data.message || 'Form submission failed');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Oops! There was a problem submitting your inquiry. Please try again or reach out to us directly at +2349020023287.');
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
+    }
   });
 
   // ==========================================
