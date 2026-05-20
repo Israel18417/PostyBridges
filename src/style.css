@@ -65,6 +65,37 @@ body, header, .service-card, .stats-card, .testimonial-card, .estimator-board, .
   opacity: 0.12;
 }
 
+/* ── Light / Day mode nav link brightness overrides ── */
+[data-theme="light"] .nav-links a {
+  color: #00a844;  /* vivid mid-green default */
+}
+
+/* Each link gets its own shining green shade */
+[data-theme="light"] .nav-links li:nth-child(1) a { --link-color: #00e676; --link-color-rgb: 0, 230, 118; }
+[data-theme="light"] .nav-links li:nth-child(2) a { --link-color: #00c853; --link-color-rgb: 0, 200, 83; }
+[data-theme="light"] .nav-links li:nth-child(3) a { --link-color: #69f0ae; --link-color-rgb: 105, 240, 174; }
+[data-theme="light"] .nav-links li:nth-child(4) a { --link-color: #00e5ff; --link-color-rgb: 0, 229, 255; }
+[data-theme="light"] .nav-links li:nth-child(5) a { --link-color: #40c4ff; --link-color-rgb: 64, 196, 255; }
+[data-theme="light"] .nav-links li:nth-child(6) a { --link-color: #18ffb2; --link-color-rgb: 24, 255, 178; }
+
+[data-theme="light"] .nav-links a:hover,
+[data-theme="light"] .nav-links a.active {
+  color: var(--link-color);
+  background: rgba(var(--link-color-rgb), 0.18);
+  border-color: rgba(var(--link-color-rgb), 0.55);
+  box-shadow: 0 0 18px rgba(var(--link-color-rgb), 0.45),
+              inset 0 0 12px rgba(var(--link-color-rgb), 0.12);
+  text-shadow: 0 0 8px rgba(var(--link-color-rgb), 0.7);
+}
+
+/* Mobile drawer - light mode */
+[data-theme="light"] .nav-links li:nth-child(1) a { --link-color: #00e676; --link-color-rgb: 0, 230, 118; }
+[data-theme="light"] .nav-links li:nth-child(2) a { --link-color: #00c853; --link-color-rgb: 0, 200, 83; }
+[data-theme="light"] .nav-links li:nth-child(3) a { --link-color: #69f0ae; --link-color-rgb: 105, 240, 174; }
+[data-theme="light"] .nav-links li:nth-child(4) a { --link-color: #00e5ff; --link-color-rgb: 0, 229, 255; }
+[data-theme="light"] .nav-links li:nth-child(5) a { --link-color: #40c4ff; --link-color-rgb: 64, 196, 255; }
+[data-theme="light"] .nav-links li:nth-child(6) a { --link-color: #18ffb2; --link-color-rgb: 24, 255, 178; }
+
 /* Reset and Global Styles */
 * {
   margin: 0;
