@@ -610,56 +610,26 @@ document.addEventListener('DOMContentLoaded', () => {
     bookingModal?.classList.remove('active');
   });
 
-  // Contact Form Submission handler (sending email via Formsubmit AJAX API)
-  contactFormElement?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
+  // Set dynamic thank you redirect URL for FormSubmit (bypassing CORS)
+  const formNextInput = document.getElementById('formsubmit-next') as HTMLInputElement | null;
+  if (formNextInput) {
+    formNextInput.value = window.location.origin + window.location.pathname + '?submitted=true#contact';
+  }
+
+  // Check if form was just successfully submitted via redirect
+  if (window.location.search.includes('submitted=true')) {
+    alert('Thank you for contacting PostyBridges! We have received your car service specifications and an automotive electrical technician will reach out to you shortly.');
+    // Clean up query parameters from address bar to prevent repeat alerts on refresh
+    const cleanUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + window.location.hash;
+    window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+  }
+
+  // Loading state feedback on button click before submission redirect
+  contactFormElement?.addEventListener('submit', () => {
     const submitBtn = contactFormElement.querySelector('button[type="submit"]') as HTMLButtonElement | null;
-    const originalText = submitBtn ? submitBtn.innerHTML : 'Send Message';
-    
     if (submitBtn) {
       submitBtn.disabled = true;
       submitBtn.innerHTML = 'Sending...';
-    }
-
-    const nameVal = (document.getElementById('contact-name') as HTMLInputElement)?.value;
-    const emailVal = (document.getElementById('contact-email') as HTMLInputElement)?.value;
-    const phoneVal = (document.getElementById('contact-phone') as HTMLInputElement)?.value;
-    const vehicleVal = (document.getElementById('contact-vehicle') as HTMLInputElement)?.value;
-    const messageVal = (document.getElementById('contact-message') as HTMLTextAreaElement)?.value;
-
-    try {
-      const response = await fetch('https://formsubmit.co/ajax/postybridges@gmail.com', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          name: nameVal,
-          email: emailVal,
-          phone: phoneVal,
-          vehicle: vehicleVal,
-          message: messageVal
-        })
-      });
-
-      const data = await response.json();
-      
-      if (response.ok && data.success === 'true') {
-        alert('Thank you for contacting PostyBridges! We have received your car service specifications and an automotive electrical technician will reach out to you shortly.');
-        contactFormElement.reset();
-      } else {
-        throw new Error(data.message || 'Form submission failed');
-      }
-    } catch (err) {
-      console.error(err);
-      alert('Oops! There was a problem submitting your inquiry. Please try again or reach out to us directly at +2349020023287.');
-    } finally {
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalText;
-      }
     }
   });
 

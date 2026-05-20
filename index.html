@@ -609,7 +609,12 @@
 
         <div class="contact-form-wrapper">
           <h3 style="margin-bottom: 24px; font-size: 1.5rem;">Send Technical Message</h3>
-          <form class="contact-form" id="contact-form-element">
+          <form class="contact-form" id="contact-form-element" action="https://formsubmit.co/postybridges@gmail.com" method="POST">
+            <!-- FormSubmit Configurations -->
+            <input type="hidden" name="_captcha" value="false" />
+            <input type="hidden" name="_subject" value="New Service Upgrade Inquiry - PostyBridges" />
+            <input type="hidden" name="_next" id="formsubmit-next" value="" />
+
             <div class="form-group">
               <label for="contact-name">Full Name</label>
               <input type="text" id="contact-name" name="name" class="input-field" placeholder="John Doe" required />
