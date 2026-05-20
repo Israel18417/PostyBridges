@@ -1796,6 +1796,19 @@ footer {
     font-size: 2.4rem;
   }
 
+  .hero-section {
+    text-align: center;
+    justify-items: center;
+  }
+
+  .hero-content p {
+    text-align: center;
+  }
+
+  .hero-buttons {
+    justify-content: center;
+  }
+
   .modal-content {
     padding: 24px;
   }
@@ -1807,6 +1820,26 @@ footer {
   .modal-details-grid {
     grid-template-columns: 1fr;
     gap: 20px;
+  }
+
+  /* Center the Why Us section */
+  .why-layout {
+    text-align: center;
+  }
+
+  .why-feature-item {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  /* Center stats */
+  .stats-grid {
+    justify-items: center;
+  }
+
+  .stat-card {
+    text-align: center;
   }
 }
 
@@ -1822,6 +1855,15 @@ footer {
 
   .section-header {
     margin-bottom: 40px;
+    text-align: center;
+  }
+
+  .section-header h2 {
+    font-size: 1.75rem;
+  }
+
+  .section-header p {
+    font-size: 0.95rem;
   }
 
   .hero-content,
@@ -1833,11 +1875,23 @@ footer {
 
   .hero-section {
     justify-items: center;
+    text-align: center;
   }
 
   .hero-content {
     width: 100%;
     max-width: 640px;
+    text-align: center;
+  }
+
+  .hero-content h1 {
+    font-size: 2rem;
+    text-align: center;
+  }
+
+  .hero-content p {
+    text-align: center;
+    font-size: 0.95rem;
   }
 
   .hero-visual {
@@ -1862,17 +1916,36 @@ footer {
     flex-direction: column;
     gap: 12px;
     width: 100%;
+    align-items: center;
   }
 
   .hero-buttons button {
     width: 100%;
     justify-content: center;
   }
-  
+
+  /* Services - center cards */
+  .services-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
   .service-card {
     padding: 24px;
+    text-align: center;
   }
-  
+
+  .service-card h3 {
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .service-link {
+    justify-content: center;
+  }
+
+  /* Estimator - center */
   .radio-cards {
     grid-template-columns: 1fr;
   }
@@ -1883,8 +1956,103 @@ footer {
 
   .estimator-board {
     padding: 24px 16px;
+    text-align: center;
   }
-  
+
+  .estimator-board-header {
+    text-align: center;
+  }
+
+  .pricing-panel {
+    justify-content: center;
+  }
+
+  .estimator-actions {
+    justify-content: center;
+  }
+
+  /* Why Us - center */
+  .why-layout {
+    text-align: center;
+  }
+
+  .why-feature-item {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .why-feature-text {
+    text-align: center;
+  }
+
+  .why-feature-text h3,
+  .why-feature-text p {
+    text-align: center;
+  }
+
+  /* Stats - center */
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    justify-items: center;
+  }
+
+  .stat-card {
+    text-align: center;
+    width: 100%;
+  }
+
+  /* Testimonials - center */
+  .testimonial-card {
+    padding: 32px 16px;
+    text-align: center;
+  }
+
+  .testimonial-card::before {
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 5rem;
+    top: 5px;
+  }
+
+  .testimonial-text {
+    font-size: 1.05rem;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .testimonial-author {
+    justify-content: center;
+  }
+
+  .testimonial-rating {
+    justify-content: center;
+  }
+
+  .testimonial-controls {
+    justify-content: center;
+  }
+
+  /* FAQ - center */
+  .faq-item {
+    text-align: left;
+  }
+
+  /* Contact - center */
+  .contact-info {
+    text-align: center;
+  }
+
+  .contact-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .contact-card-text {
+    text-align: center;
+  }
+
   .contact-form {
     grid-template-columns: 1fr;
   }
@@ -1897,24 +2065,31 @@ footer {
     padding: 24px 16px;
   }
 
-  .testimonial-card {
-    padding: 32px 16px;
+  .contact-form-wrapper h3 {
+    text-align: center;
   }
 
-  .testimonial-card::before {
-    left: 20px;
-    font-size: 5rem;
-    top: 5px;
-  }
-
-  .testimonial-text {
-    font-size: 1.05rem;
-    margin-bottom: 20px;
-  }
-  
+  /* Footer - center */
   .footer-container {
     grid-template-columns: 1fr;
     gap: 30px;
+    text-align: center;
+  }
+
+  .footer-brand {
+    align-items: center;
+  }
+
+  .footer-col {
+    text-align: center;
+  }
+
+  .footer-col ul {
+    align-items: center;
+  }
+
+  .social-links {
+    justify-content: center;
   }
   
   .footer-bottom {
