@@ -35,7 +35,7 @@ const serviceData: Record<string, ServiceDetails> = {
       { label: 'Backup Battery', value: '450mAh Li-Polymer' },
       { label: 'Enclosure Rating', value: 'IP67 Waterproof & Dustproof' }
     ],
-    basePrice: 270000
+    basePrice: 80000
   },
   speedlimit: {
     id: 'speedlimit',
