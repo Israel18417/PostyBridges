@@ -131,8 +131,8 @@ const selectedServices = new Set<string>(['tracking']); // Default check trackin
 
 const vehicleFactors: Record<string, { label: string, factor: number }> = {
   sedan: { label: 'Sedan / Coupe (1.0x)', factor: 1.0 },
-  suv: { label: 'SUV / Truck (1.5x)', factor: 1.25 },
-  luxury: { label: 'Luxury / EV (1.75x)', factor: 1.5 }
+  suv: { label: 'SUV / Truck (1.5x)', factor: 1.15 },
+  luxury: { label: 'Luxury / EV (1.75x)', factor: 1.25 }
 };
 
 // ==========================================
