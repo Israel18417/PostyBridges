@@ -12,7 +12,7 @@ interface ServiceDetails {
   warranty: string;
   features: { title: string; desc: string }[];
   specs: { label: string; value: string }[];
-  basePrice: number;
+  prices: Record<string, number>;
 }
 
 const serviceData: Record<string, ServiceDetails> = {
@@ -35,7 +35,11 @@ const serviceData: Record<string, ServiceDetails> = {
       { label: 'Backup Battery', value: '450mAh Li-Polymer' },
       { label: 'Enclosure Rating', value: 'IP67 Waterproof & Dustproof' }
     ],
-    basePrice: 80000
+    prices: {
+      sedan: 80000,
+      suv: 120000,
+      luxury: 150000
+    }
   },
   speedlimit: {
     id: 'speedlimit',
@@ -56,7 +60,11 @@ const serviceData: Record<string, ServiceDetails> = {
       { label: 'Diagnostics Interface', value: 'OBD-II compliant calibration port' },
       { label: 'Voltage Support', value: '12V / 24V Auto-switching' }
     ],
-    basePrice: 180000
+    prices: {
+      sedan: 100000,
+      suv: 150000,
+      luxury: 150000
+    }
   },
   dashcam: {
     id: 'dashcam',
@@ -77,7 +85,11 @@ const serviceData: Record<string, ServiceDetails> = {
       { label: 'Storage Capacity', value: 'Supports up to 256GB MicroSD' },
       { label: 'Battery Monitor', value: 'Automatic low-voltage power cut-off' }
     ],
-    basePrice: 225000
+    prices: {
+      sedan: 90000,
+      suv: 90000,
+      luxury: 90000
+    }
   },
   android: {
     id: 'android',
@@ -98,7 +110,11 @@ const serviceData: Record<string, ServiceDetails> = {
       { label: 'Operating System', value: 'Android Automotive OS' },
       { label: 'Connectivity', value: 'Wi-Fi, Bluetooth 5.0, GPS, 4G SIM tray' }
     ],
-    basePrice: 525000
+    prices: {
+      sedan: 70000,
+      suv: 70000,
+      luxury: 70000
+    }
   },
   pushstart: {
     id: 'pushstart',
@@ -119,7 +135,11 @@ const serviceData: Record<string, ServiceDetails> = {
       { label: 'Button Lifespan', value: 'Tested for 500,000 engine start cycles' },
       { label: 'Immobilizer Bypass', value: 'Compatible with transponder key modules' }
     ],
-    basePrice: 375000
+    prices: {
+      sedan: 160000,
+      suv: 160000,
+      luxury: 160000
+    }
   }
 };
 
@@ -128,12 +148,37 @@ const serviceData: Record<string, ServiceDetails> = {
 // ==========================================
 let selectedVehicle = 'sedan';
 const selectedServices = new Set<string>(['tracking']); // Default check tracking
+const installationFeePerService = 20000;
+const discountedInstallationFee = 40000;
 
-const vehicleFactors: Record<string, { label: string, factor: number }> = {
-  sedan: { label: 'Sedan / Coupe (1.0x)', factor: 1.0 },
-  suv: { label: 'SUV / Truck (1.5x)', factor: 1.15 },
-  luxury: { label: 'Luxury / EV (1.75x)', factor: 1.25 }
+const vehicleProfiles: Record<string, { label: string }> = {
+  sedan: { label: 'Sedan / Coupe' },
+  suv: { label: 'SUV / Truck' },
+  luxury: { label: 'Luxury / EV' }
 };
+
+function formatNaira(value: number) {
+  return `₦${Math.round(value).toLocaleString('en-NG')}`;
+}
+
+function getServicePrice(details: ServiceDetails, vehicleType: string) {
+  return details.prices[vehicleType] ?? details.prices.sedan ?? 0;
+}
+
+function getServicePriceLabel(details: ServiceDetails) {
+  const uniquePrices = [...new Set(Object.values(details.prices))].sort((a, b) => a - b);
+  if (uniquePrices.length === 1) {
+    return formatNaira(uniquePrices[0]);
+  }
+  return `${formatNaira(uniquePrices[0])} - ${formatNaira(uniquePrices[uniquePrices.length - 1])}`;
+}
+
+function getInstallationFee(serviceCount: number) {
+  if (serviceCount >= 3) {
+    return discountedInstallationFee;
+  }
+  return serviceCount * installationFeePerService;
+}
 
 // ==========================================
 // DOM Elements Setup & Event Handlers
@@ -357,7 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
           <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
             <span style="color:var(--text-secondary)">Base Service Price:</span>
-            <span style="color:var(--accent-cyan); font-weight:bold;">₦${details.basePrice.toLocaleString('en-NG')}</span>
+            <span style="color:var(--accent-cyan); font-weight:bold;">${getServicePriceLabel(details)}</span>
           </div>
         </div>
       </div>
@@ -513,31 +558,29 @@ document.addEventListener('DOMContentLoaded', () => {
   // Calculate live estimate values
   function calculateEstimate() {
     let subtotal = 0;
+
+    checklistItems.forEach(item => {
+      const serviceKey = item.getAttribute('data-service') || '';
+      const details = serviceData[serviceKey];
+      const priceLabel = item.querySelector('.checklist-item-price');
+      if (details && priceLabel) {
+        priceLabel.textContent = formatNaira(getServicePrice(details, selectedVehicle));
+      }
+    });
     
-    // Sum standard check boxes base prices
+    // Sum selected equipment prices for the current vehicle profile.
     selectedServices.forEach(srvKey => {
       const details = serviceData[srvKey];
       if (details) {
-        subtotal += details.basePrice;
+        subtotal += getServicePrice(details, selectedVehicle);
       }
     });
 
-    const vehicleProfile = vehicleFactors[selectedVehicle];
-    const factor = vehicleProfile ? vehicleProfile.factor : 1.0;
-    
-    // Calculate total factored by car complexity
-    let factoredTotal = subtotal * factor;
-    
-    // Apply dynamic volume discount
-    let discountPercent = 0;
-    if (selectedServices.size === 2) {
-      discountPercent = 5;
-    } else if (selectedServices.size >= 3) {
-      discountPercent = 10;
-    }
-    
-    const discountAmount = factoredTotal * (discountPercent / 100);
-    const finalTotal = factoredTotal - discountAmount;
+    const vehicleProfile = vehicleProfiles[selectedVehicle];
+    const standardInstallationFee = selectedServices.size * installationFeePerService;
+    const installationFee = getInstallationFee(selectedServices.size);
+    const discountAmount = standardInstallationFee - installationFee;
+    const finalTotal = subtotal + installationFee;
 
     // Update dynamic pricing UI
     if (liveTotal) {
@@ -546,9 +589,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Toggle Discount Tag
     if (discountIndicator && discountText) {
-      if (discountPercent > 0) {
+      if (discountAmount > 0) {
         discountIndicator.style.display = 'inline-flex';
-        discountText.textContent = `Bundle Discount: Save ${discountPercent}% (-₦${Math.round(discountAmount).toLocaleString('en-NG')})`;
+        discountText.textContent = `Installation Discount: Save ${formatNaira(discountAmount)}`;
       } else {
         discountIndicator.style.display = 'none';
       }
@@ -562,11 +605,10 @@ document.addEventListener('DOMContentLoaded', () => {
       summaryServicesCount.textContent = `${selectedServices.size} Upgrade${selectedServices.size !== 1 ? 's' : ''}`;
     }
     if (summaryHardwarePrice) {
-      summaryHardwarePrice.textContent = `₦${Math.round(subtotal).toLocaleString('en-NG')}`;
+      summaryHardwarePrice.textContent = formatNaira(subtotal);
     }
     if (summaryInstallPrice) {
-      const installVal = subtotal * (factor - 1.0);
-      summaryInstallPrice.textContent = `₦${Math.round(installVal).toLocaleString('en-NG')}`;
+      summaryInstallPrice.textContent = formatNaira(installationFee);
     }
   }
 
@@ -585,7 +627,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Generate simulated reference ID
     const refId = `#PB-${Math.floor(1000 + Math.random() * 9000)}`;
     const totalValStr = liveTotal ? liveTotal.textContent : '0';
-    const vehicleProfile = vehicleFactors[selectedVehicle];
+    const vehicleProfile = vehicleProfiles[selectedVehicle];
     
     // Populate variables inside success dialog modal
     const successRef = document.getElementById('success-ref');
