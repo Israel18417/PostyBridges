@@ -1453,6 +1453,44 @@ section {
 
 .form-status.error {
   color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.08);
+  border: 1px solid rgba(255, 107, 107, 0.25);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.status-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: rgba(var(--accent-cyan-rgb), 0.08);
+  border: 1px solid rgba(var(--accent-cyan-rgb), 0.28);
+  border-radius: 14px;
+  padding: 16px;
+  text-align: left;
+}
+
+.status-card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--bg-primary);
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+  box-shadow: 0 0 20px rgba(var(--accent-cyan-rgb), 0.25);
+}
+
+.status-card strong,
+.status-card span {
+  display: block;
+}
+
+.status-card strong {
+  color: var(--text-primary);
+  margin-bottom: 3px;
 }
 
 .contact-form {
@@ -1555,6 +1593,13 @@ footer {
   transform: translateY(-3px);
 }
 
+.social-btn-x span {
+  font-family: var(--font-header);
+  font-weight: 800;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
 .footer-col h4 {
   font-size: 1.05rem;
   margin-bottom: 20px;
@@ -1605,6 +1650,45 @@ footer {
 
 .footer-bottom-links a:hover {
   color: var(--accent-cyan);
+}
+
+.legal-modal-content {
+  max-width: 860px;
+}
+
+.legal-updated {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 18px;
+}
+
+.legal-sections {
+  display: grid;
+  gap: 16px;
+}
+
+.legal-section {
+  max-width: none;
+  padding: 18px;
+  margin: 0;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+}
+
+.legal-section h4 {
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+.legal-section p,
+.legal-note {
+  font-size: 0.95rem;
+}
+
+.legal-note {
+  margin-top: 20px;
+  color: var(--text-muted);
 }
 
 /* Success Booking Modal Customizations */
@@ -1912,11 +1996,29 @@ footer {
 
   .nav-container {
     padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .logo-text {
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+  }
+
+  .theme-toggle-btn {
+    width: 100%;
+    min-width: 0;
+    margin: 8px 0 0;
+  }
+
+  .theme-toggle-btn .toggle-text {
+    font-size: 0.9rem;
   }
 
   .nav-links {
     width: 100%;
     right: -100%;
+    padding: 92px 18px 32px;
+    overflow-y: auto;
   }
 
   .nav-links.active {
@@ -1944,6 +2046,11 @@ footer {
   .service-card {
     padding: 24px;
     text-align: center;
+    border-radius: 16px;
+  }
+
+  .service-card-image {
+    height: 150px;
   }
 
   .service-card h3 {
@@ -1963,11 +2070,13 @@ footer {
   
   .estimator-form {
     padding: 24px 16px;
+    border-radius: 18px;
   }
 
   .estimator-board {
     padding: 24px 16px;
     text-align: center;
+    border-radius: 18px;
   }
 
   .estimator-board-header {
@@ -1976,6 +2085,31 @@ footer {
 
   .pricing-panel {
     justify-content: center;
+  }
+
+  .pricing-value {
+    font-size: 2.55rem;
+  }
+
+  .checklist-item {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .checklist-item-info {
+    align-items: flex-start;
+    min-width: 0;
+  }
+
+  .checklist-item-price {
+    flex-shrink: 0;
+    font-size: 0.88rem;
+    text-align: right;
+  }
+
+  .summary-list li,
+  .success-detail-row {
+    gap: 12px;
   }
 
   .estimator-actions {
@@ -2072,8 +2206,13 @@ footer {
     grid-column: span 1;
   }
 
+  .contact-form .form-status {
+    grid-column: span 1;
+  }
+
   .contact-form-wrapper {
     padding: 24px 16px;
+    border-radius: 18px;
   }
 
   .contact-form-wrapper h3 {
@@ -2107,6 +2246,54 @@ footer {
     flex-direction: column;
     gap: 16px;
     text-align: center;
+  }
+
+  .footer-bottom-links {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px 18px;
+  }
+
+  .modal-overlay {
+    padding: 14px;
+    align-items: flex-end;
+  }
+
+  .modal-content {
+    max-height: 88vh;
+    border-radius: 18px;
+  }
+
+  .legal-section {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 420px) {
+  .logo-text {
+    display: none;
+  }
+
+  .hero-content h1 {
+    font-size: 1.82rem;
+  }
+
+  .checklist-item {
+    flex-direction: column;
+  }
+
+  .checklist-item-price {
+    width: 100%;
+    text-align: left;
+    padding-left: 30px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-bottom-links {
+    flex-direction: column;
   }
 }
 
