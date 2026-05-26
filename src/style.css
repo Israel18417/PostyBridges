@@ -1461,7 +1461,18 @@ section {
   gap: 20px;
 }
 
+.form-honeypot {
+  position: absolute;
+  left: -9999px;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .contact-form .form-group.full-width {
+  grid-column: span 2;
+}
+
+.contact-form .form-status {
   grid-column: span 2;
 }
 

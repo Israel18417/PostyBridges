@@ -692,7 +692,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (!response.ok) {
         const errorBody = await response.json().catch(() => ({}));
-        throw new Error(errorBody.error || `Form submission failed with status ${response.status}`);
+        const fallbackMessage = response.status >= 500
+          ? 'The contact service is temporarily unavailable. Please email postybridges@gmail.com directly or try again later.'
+          : 'Please check the form and try again.';
+        throw new Error(errorBody.error || fallbackMessage);
       }
 
       if (statusMessage) {
@@ -700,9 +703,15 @@ document.addEventListener('DOMContentLoaded', () => {
         statusMessage.classList.add('success');
       }
       contactFormElement.reset();
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Send Message';
+      }
     } catch (error) {
       if (statusMessage) {
-        statusMessage.textContent = 'The contact service is temporarily unavailable. Please email postybridges@gmail.com directly or try again later.';
+        statusMessage.textContent = error instanceof Error
+          ? error.message
+          : 'The contact service is temporarily unavailable. Please email postybridges@gmail.com directly or try again later.';
         statusMessage.classList.add('error');
       }
       if (submitBtn) {

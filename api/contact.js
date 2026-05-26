@@ -1,5 +1,22 @@
 import nodemailer from 'nodemailer';
 
+function cleanText(value, maxLength = 1000) {
+  return String(value || '').trim().slice(0, maxLength);
+}
+
+function escapeHtml(value) {
+  return cleanText(value, 5000)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
 async function parseBody(req) {
   if (req.body && Object.keys(req.body).length > 0) {
     return req.body;
@@ -38,9 +55,24 @@ export default async function handler(req, res) {
     return;
   }
 
-  const { name, email, phone, vehicle, message } = body;
+  if (body.website) {
+    res.status(200).json({ success: true });
+    return;
+  }
+
+  const name = cleanText(body.name, 120);
+  const email = cleanText(body.email, 160);
+  const phone = cleanText(body.phone, 80);
+  const vehicle = cleanText(body.vehicle, 160);
+  const message = cleanText(body.message, 3000);
+
   if (!name || !email || !vehicle || !message) {
     res.status(400).json({ error: 'Missing required form fields' });
+    return;
+  }
+
+  if (!isValidEmail(email)) {
+    res.status(400).json({ error: 'Please enter a valid email address' });
     return;
   }
 
@@ -75,12 +107,12 @@ export default async function handler(req, res) {
     text: `Name: ${name}\nEmail: ${email}\nPhone: ${phone || 'N/A'}\nVehicle: ${vehicle}\n\nMessage:\n${message}`,
     html: `
       <h2>New PostyBridges Inquiry</h2>
-      <p><strong>Name:</strong> ${name}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
-      <p><strong>Vehicle:</strong> ${vehicle}</p>
+      <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+      <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+      <p><strong>Phone:</strong> ${escapeHtml(phone || 'N/A')}</p>
+      <p><strong>Vehicle:</strong> ${escapeHtml(vehicle)}</p>
       <p><strong>Message:</strong></p>
-      <p>${message.replace(/\n/g, '<br/>')}</p>
+      <p>${escapeHtml(message).replace(/\n/g, '<br/>')}</p>
     `
   };
 
