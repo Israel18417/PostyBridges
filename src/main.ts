@@ -307,6 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const legalModalBody = document.getElementById('legal-modal-body');
 
   // Header Scroll Effect
+  const sections = ['hero', 'services', 'estimator', 'why-us', 'faq', 'contact'];
   let scrollRaf = 0;
   window.addEventListener('scroll', () => {
     if (window.scrollY > 50) {
@@ -321,13 +322,11 @@ document.addEventListener('DOMContentLoaded', () => {
     scrollRaf = window.requestAnimationFrame(() => {
       highlightNavOnScroll();
     });
-  });
+  }, { passive: true });
 
   // Scroll section highlight logic
   function highlightNavOnScroll() {
     const scrollPos = window.scrollY + 150;
-    const sections = ['hero', 'services', 'estimator', 'why-us', 'faq', 'contact'];
-    
     for (const sectionId of sections) {
       const section = document.getElementById(sectionId);
       if (section) {
@@ -413,19 +412,38 @@ document.addEventListener('DOMContentLoaded', () => {
   nextBtn?.addEventListener('click', nextSlide);
   prevBtn?.addEventListener('click', prevSlide);
 
-  // Auto-scroll testimonials every 6 seconds
+  // Auto-scroll testimonials every 6 seconds once the browser is idle and the slider is visible.
   let autoScroll = 0;
+  let autoScrollTimeout = 0;
+
   const startAutoScroll = () => {
+    if (autoScroll) return;
+    autoScroll = window.setInterval(nextSlide, 6000);
+  };
+
+  const stopAutoScroll = () => {
     if (autoScroll) {
       clearInterval(autoScroll);
+      autoScroll = 0;
     }
-    autoScroll = window.setInterval(nextSlide, 6000);
+  };
+
+  const scheduleAutoScroll = () => {
+    if (autoScrollTimeout) {
+      clearTimeout(autoScrollTimeout);
+    }
+    autoScrollTimeout = window.setTimeout(() => {
+      const sliderRect = testimonialsSlider?.getBoundingClientRect();
+      if (sliderRect && sliderRect.top < window.innerHeight && sliderRect.bottom > 0) {
+        startAutoScroll();
+      }
+    }, 7000);
   };
 
   // Reset auto-scroll timer on manual navigation
   [prevBtn, nextBtn].forEach(btn => {
     btn?.addEventListener('click', () => {
-      clearInterval(autoScroll);
+      stopAutoScroll();
       startAutoScroll();
     });
   });
@@ -437,6 +455,20 @@ document.addEventListener('DOMContentLoaded', () => {
       setTimeout(work, 500);
     }
   };
+
+  const testimonialsObserver = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      if (entry.isIntersecting) {
+        scheduleAutoScroll();
+      } else {
+        stopAutoScroll();
+      }
+    }
+  }, { threshold: 0.1 });
+
+  if (testimonialsSlider) {
+    testimonialsObserver.observe(testimonialsSlider);
+  }
 
   runWhenIdle(() => {
     // ==========================================
