@@ -387,88 +387,90 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('estimator')?.scrollIntoView({ behavior: 'smooth' });
   });
 
-  // ==========================================
-  // Testimonials Carousel Logic
-  // ==========================================
-  let currentSlide = 0;
-  const slideCount = document.querySelectorAll('.testimonial-slide').length;
-  
-  function updateSliderPosition() {
-    if (testimonialsSlider) {
-      testimonialsSlider.style.transform = `translateX(-${currentSlide * 100}%)`;
-    }
-  }
+  const setupHeavyInteractions = () => {
+    // ==========================================
+    // Testimonials Carousel Logic
+    // ==========================================
+    let currentSlide = 0;
+    const slideCount = document.querySelectorAll('.testimonial-slide').length;
 
-  function nextSlide() {
-    currentSlide = (currentSlide + 1) % slideCount;
-    updateSliderPosition();
-  }
-
-  function prevSlide() {
-    currentSlide = (currentSlide - 1 + slideCount) % slideCount;
-    updateSliderPosition();
-  }
-
-  nextBtn?.addEventListener('click', nextSlide);
-  prevBtn?.addEventListener('click', prevSlide);
-
-  // Auto-scroll testimonials every 6 seconds once the browser is idle and the slider is visible.
-  let autoScroll = 0;
-  let autoScrollTimeout = 0;
-
-  const startAutoScroll = () => {
-    if (autoScroll) return;
-    autoScroll = window.setInterval(nextSlide, 6000);
-  };
-
-  const stopAutoScroll = () => {
-    if (autoScroll) {
-      clearInterval(autoScroll);
-      autoScroll = 0;
-    }
-  };
-
-  const scheduleAutoScroll = () => {
-    if (autoScrollTimeout) {
-      clearTimeout(autoScrollTimeout);
-    }
-    autoScrollTimeout = window.setTimeout(() => {
-      const sliderRect = testimonialsSlider?.getBoundingClientRect();
-      if (sliderRect && sliderRect.top < window.innerHeight && sliderRect.bottom > 0) {
-        startAutoScroll();
+    function updateSliderPosition() {
+      if (testimonialsSlider) {
+        testimonialsSlider.style.transform = `translateX(-${currentSlide * 100}%)`;
       }
-    }, 7000);
-  };
+    }
 
-  // Reset auto-scroll timer on manual navigation
-  [prevBtn, nextBtn].forEach(btn => {
-    btn?.addEventListener('click', () => {
-      stopAutoScroll();
-      startAutoScroll();
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % slideCount;
+      updateSliderPosition();
+    }
+
+    function prevSlide() {
+      currentSlide = (currentSlide - 1 + slideCount) % slideCount;
+      updateSliderPosition();
+    }
+
+    nextBtn?.addEventListener('click', nextSlide);
+    prevBtn?.addEventListener('click', prevSlide);
+
+    // Auto-scroll testimonials every 6 seconds once the browser is idle and the slider is visible.
+    let autoScroll = 0;
+    let autoScrollTimeout = 0;
+
+    const startAutoScroll = () => {
+      if (autoScroll) return;
+      autoScroll = window.setInterval(nextSlide, 6000);
+    };
+
+    const stopAutoScroll = () => {
+      if (autoScroll) {
+        clearInterval(autoScroll);
+        autoScroll = 0;
+      }
+    };
+
+    const scheduleAutoScroll = () => {
+      if (autoScrollTimeout) {
+        clearTimeout(autoScrollTimeout);
+      }
+      autoScrollTimeout = window.setTimeout(() => {
+        const sliderRect = testimonialsSlider?.getBoundingClientRect();
+        if (sliderRect && sliderRect.top < window.innerHeight && sliderRect.bottom > 0) {
+          startAutoScroll();
+        }
+      }, 7000);
+    };
+
+    // Reset auto-scroll timer on manual navigation
+    [prevBtn, nextBtn].forEach(btn => {
+      btn?.addEventListener('click', () => {
+        stopAutoScroll();
+        startAutoScroll();
+      });
     });
-  });
+
+    const testimonialsObserver = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          scheduleAutoScroll();
+        } else {
+          stopAutoScroll();
+        }
+      }
+    }, { threshold: 0.1 });
+
+    if (testimonialsSlider) {
+      testimonialsObserver.observe(testimonialsSlider);
+    }
+  };
 
   const runWhenIdle = (work: () => void) => {
     if ('requestIdleCallback' in window) {
       (window as any).requestIdleCallback(work, { timeout: 2500 });
     } else {
-      setTimeout(work, 500);
+      setTimeout(work, 1500);
     }
   };
-
-  const testimonialsObserver = new IntersectionObserver(entries => {
-    for (const entry of entries) {
-      if (entry.isIntersecting) {
-        scheduleAutoScroll();
-      } else {
-        stopAutoScroll();
-      }
-    }
-  }, { threshold: 0.1 });
-
-  if (testimonialsSlider) {
-    testimonialsObserver.observe(testimonialsSlider);
-  }
 
   runWhenIdle(() => {
     // ==========================================
@@ -757,10 +759,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Run initial calculation once on boot
-  runWhenIdle(() => {
-    calculateEstimate();
-    startAutoScroll();
-  });
+  calculateEstimate();
+  // Carousel startup is handled inside setupHeavyInteractions.
 
   // ==========================================
   // Booking Submission & Lock Price Trigger
@@ -915,6 +915,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
   });
+
+  runWhenIdle(setupHeavyInteractions);
 
   // ==========================================
   // Light / Dark Theme Toggle Logic love it
