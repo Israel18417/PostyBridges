@@ -1,5 +1,6 @@
 import './style.css'
-import type { ServiceDetails } from './appData'
+import type { ServiceDetails } from './serviceData'
+import type { LegalData } from './legalData'
 
 // ==========================================
 // Cost Estimator System Variables & Calculations
@@ -42,7 +43,8 @@ function getInstallationFee(serviceCount: number) {
 // DOM Elements Setup & Event Handlers
 // ==========================================
 document.addEventListener('DOMContentLoaded', async () => {
-  const { serviceData, legalData } = await import('./appData');
+  const { serviceData } = await import('./serviceData');
+  let cachedLegalData: LegalData | null = null;
   // Navigation & Scroll
   const header = document.getElementById('header');
   const navLinks = document.querySelectorAll('.nav-links a');
@@ -574,8 +576,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     bookingModal?.classList.remove('active');
   });
 
-  function openLegalModal(legalKey: string) {
-    const details = legalData[legalKey];
+  async function openLegalModal(legalKey: string) {
+    if (!cachedLegalData) {
+      const module = await import('./legalData');
+      cachedLegalData = module.legalData;
+    }
+
+    const details = cachedLegalData?.[legalKey];
     if (!details || !legalModalBody || !legalModal) return;
 
     const sectionsHtml = details.sections.map(section => `
