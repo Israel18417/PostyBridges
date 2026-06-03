@@ -307,13 +307,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const legalModalBody = document.getElementById('legal-modal-body');
 
   // Header Scroll Effect
+  let scrollRaf = 0;
   window.addEventListener('scroll', () => {
     if (window.scrollY > 50) {
       header?.classList.add('scrolled');
     } else {
       header?.classList.remove('scrolled');
     }
-    highlightNavOnScroll();
+
+    if (scrollRaf) {
+      window.cancelAnimationFrame(scrollRaf);
+    }
+    scrollRaf = window.requestAnimationFrame(() => {
+      highlightNavOnScroll();
+    });
   });
 
   // Scroll section highlight logic
@@ -407,15 +414,29 @@ document.addEventListener('DOMContentLoaded', () => {
   prevBtn?.addEventListener('click', prevSlide);
 
   // Auto-scroll testimonials every 6 seconds
-  let autoScroll = setInterval(nextSlide, 6000);
-  
+  let autoScroll = 0;
+  const startAutoScroll = () => {
+    if (autoScroll) {
+      clearInterval(autoScroll);
+    }
+    autoScroll = window.setInterval(nextSlide, 6000);
+  };
+
   // Reset auto-scroll timer on manual navigation
   [prevBtn, nextBtn].forEach(btn => {
     btn?.addEventListener('click', () => {
       clearInterval(autoScroll);
-      autoScroll = setInterval(nextSlide, 6000);
+      startAutoScroll();
     });
   });
+
+  const runWhenIdle = (work: () => void) => {
+    if ('requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(work, { timeout: 2500 });
+    } else {
+      setTimeout(work, 500);
+    }
+  };
 
   // ==========================================
   // FAQ Accordion Controls
@@ -703,7 +724,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Run initial calculation once on boot
-  calculateEstimate();
+  runWhenIdle(() => {
+    calculateEstimate();
+    startAutoScroll();
+  });
 
   // ==========================================
   // Booking Submission & Lock Price Trigger
@@ -859,7 +883,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ==========================================
-  // Light / Dark Theme Toggle Logic
+  // Light / Dark Theme Toggle Logic love it
   // ==========================================
   const themeToggle = document.getElementById('theme-toggle');
   
