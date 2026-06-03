@@ -4,15 +4,20 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
   },
   "dependencies": {
-    "nodemailer": "^6.9.4"
+    "@vercel/speed-insights": "^2.0.0",
+    "next": "14.2.5",
+    "nodemailer": "^6.9.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "typescript": "~6.0.2",
-    "vite": "^8.0.12"
+    "@types/node": "25.9.1",
+    "@types/react": "19.2.16",
+    "typescript": "~6.0.2"
   }
 }
