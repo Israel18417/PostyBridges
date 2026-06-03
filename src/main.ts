@@ -438,10 +438,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // ==========================================
-  // FAQ Accordion Controls
-  // ==========================================
-  const faqItems = document.querySelectorAll('.faq-item');
+  runWhenIdle(() => {
+    // ==========================================
+    // FAQ Accordion Controls
+    // ==========================================
+    const faqItems = document.querySelectorAll('.faq-item');
   faqItems.forEach(item => {
     const question = item.querySelector('.faq-question');
     question?.addEventListener('click', () => {
@@ -881,6 +882,7 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('Contact form submission failed:', error);
     }
   });
+  });
 
   // ==========================================
   // Light / Dark Theme Toggle Logic love it
@@ -909,3 +911,4 @@ document.addEventListener('DOMContentLoaded', () => {
     setThemeLabel(newTheme);
   });
 });
+
