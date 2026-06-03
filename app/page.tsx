@@ -315,8 +315,39 @@ export default function HomePage() {
   const [legalModalKey, setLegalModalKey] = useState<keyof typeof legalData | null>(null)
   const [isLegalModalOpen, setIsLegalModalOpen] = useState(false)
   const [faqOpenIndex, setFaqOpenIndex] = useState<number | null>(null)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark')
+  const [activeSection, setActiveSection] = useState('hero')
 
   const selectedServicesArray = useMemo(() => Array.from(selectedServices), [selectedServices])
+
+  useEffect(() => {
+    const savedTheme = window.localStorage.getItem('theme') as 'light' | 'dark' | null
+    const initialTheme = savedTheme ?? 'dark'
+    setTheme(initialTheme)
+    document.documentElement.setAttribute('data-theme', initialTheme)
+  }, [])
+
+  useEffect(() => {
+    const sectionIds = ['hero', 'services', 'estimator', 'why-us', 'faq', 'contact']
+    const handleScroll = () => {
+      const scrollPos = window.scrollY + 160
+      for (const sectionId of sectionIds) {
+        const section = document.getElementById(sectionId)
+        if (!section) continue
+        const top = section.offsetTop
+        const height = section.offsetHeight
+        if (scrollPos >= top && scrollPos < top + height) {
+          setActiveSection(sectionId)
+          return
+        }
+      }
+      setActiveSection('hero')
+    }
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const totals = useMemo(() => {
     const subtotal = selectedServicesArray.reduce((sum, serviceKey) => {
@@ -384,8 +415,63 @@ export default function HomePage() {
   const currentLegal = legalModalKey ? legalData[legalModalKey] : null
   const vehicleLabel = vehicleProfiles[selectedVehicle]?.label ?? 'Sedan / Coupe'
 
+  const toggleTheme = () => {
+    const nextTheme = theme === 'light' ? 'dark' : 'light'
+    setTheme(nextTheme)
+    window.localStorage.setItem('theme', nextTheme)
+    document.documentElement.setAttribute('data-theme', nextTheme)
+  }
+
   return (
     <main>
+      <header id="header" className={`site-header ${isMenuOpen ? 'open' : ''}`}>
+        <div className="header-inner">
+          <a href="#hero" className="logo">PostyBridges</a>
+          <nav id="nav-links" className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
+            {[
+              ['services', 'Services'],
+              ['estimator', 'Estimator'],
+              ['why-us', 'Why Us'],
+              ['faq', 'FAQs'],
+              ['contact', 'Contact']
+            ].map(([id, label]) => (
+              <a
+                key={id}
+                href={`#${id}`}
+                className={activeSection === id ? 'active' : ''}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {label}
+              </a>
+            ))}
+          </nav>
+          <div className="header-actions">
+            <button id="theme-toggle" type="button" className="theme-toggle" onClick={toggleTheme}>
+              <span className="toggle-text">{theme === 'light' ? 'Dark mode' : 'Light mode'}</span>
+            </button>
+            <button
+              id="btn-header-quote"
+              type="button"
+              className="btn-primary"
+              onClick={() => document.getElementById('estimator')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              Get Quote
+            </button>
+            <button
+              id="hamburger-menu"
+              type="button"
+              className={`hamburger ${isMenuOpen ? 'open' : ''}`}
+              onClick={() => setIsMenuOpen((open) => !open)}
+              aria-label="Toggle navigation"
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+          </div>
+        </div>
+      </header>
+
       <section className="page-hero" id="hero">
         <div className="page-hero-content">
           <p className="section-tag">Next-Gen Vehicle Tech</p>
@@ -394,8 +480,9 @@ export default function HomePage() {
             Premium GPS tracking, dash cams, speed governors, Android upgrades, and keyless start systems for modern vehicles.
           </p>
           <div className="hero-actions">
-            <a href="#estimator" className="btn-primary">Book a Quote</a>
-            <a href="#contact" className="btn-secondary">Contact HQ</a>
+            <a id="btn-explore" href="#services" className="btn-secondary">Explore Services</a>
+            <a id="btn-estimate" href="#estimator" className="btn-primary">Book a Quote</a>
+            <a href="#contact" className="btn-tertiary">Contact HQ</a>
           </div>
         </div>
         <div className="hero-visual">
