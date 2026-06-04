@@ -9,6 +9,7 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="alternate icon" href="/favicon.ico" type="image/x-icon" />
     <link rel="mask-icon" href="/favicon.svg" color="#863bff" />
+    <link rel="preload" href="/hero-car.webp" as="image" type="image/webp" />
     <link rel="apple-touch-icon" href="/logo.jpg" />
     <meta name="theme-color" content="#863bff" />
   </head>
@@ -21,7 +22,10 @@
     <header id="header">
       <div class="nav-container">
         <a href="#" class="logo">
-          <img src="/logo.jpg" alt="PostyBridges Logo" class="logo-img" />
+          <picture>
+            <source srcset="/logo.webp" type="image/webp" />
+            <img src="/logo.jpg" alt="PostyBridges Logo" class="logo-img" width="900" height="600" decoding="async" />
+          </picture>
           <span class="logo-text">PostyBridges</span>
         </a>
         <nav>
@@ -63,7 +67,10 @@
       </div>
       <div class="hero-visual">
         <div class="hero-image-wrapper pulse-glow">
-          <img src="/hero-car.png" alt="Futuristic glowing connected car dashboard and tech systems" class="hero-image" />
+          <picture>
+            <source srcset="/hero-car.webp" type="image/webp" />
+            <img src="/hero-car.png" alt="Futuristic glowing connected car dashboard and tech systems" class="hero-image" width="1024" height="1024" loading="eager" decoding="async" fetchpriority="high" />
+          </picture>
         </div>
         <!-- Floating Badges -->
         <div class="floating-badge badge-1">
@@ -99,7 +106,10 @@
         <!-- Service 1: GPS Vehicle Tracking -->
         <div class="service-card" data-service="tracking">
           <div class="service-card-image">
-            <img src="/tracking.png" alt="Real-time vehicle GPS tracking interface dashboard on mobile phone" />
+            <picture>
+              <source srcset="/tracking.webp" type="image/webp" />
+              <img src="/tracking.png" alt="Real-time vehicle GPS tracking interface dashboard on mobile phone" width="1024" height="1024" loading="lazy" decoding="async" />
+            </picture>
           </div>
           <h3>GPS Vehicle Tracking <span>Active</span></h3>
           <p>Real-time location monitoring, geofencing parameters, remote engine shutdown, and detailed travel history logs accessible on your mobile devices.</p>
@@ -654,7 +664,10 @@
       <div class="footer-container">
         <div class="footer-brand">
           <a href="#" class="logo" style="margin-bottom: 16px;">
-            <img src="/logo.jpg" alt="PostyBridges Logo" class="logo-img" />
+            <picture>
+              <source srcset="/logo.webp" type="image/webp" />
+              <img src="/logo.jpg" alt="PostyBridges Logo" class="logo-img" width="900" height="600" decoding="async" loading="lazy" />
+            </picture>
           </a>
           <p>Next-gen electronic and smart vehicle system installation. Transforming security, convenience, and fleet dynamics.</p>
           <div class="social-links">
