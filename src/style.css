@@ -578,6 +578,29 @@ section:not(.hero-section) {
 
 .hero-visual {
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-image-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 240, 255, 0.15);
+  border: 1px solid var(--glass-border);
+  transition: box-shadow var(--transition-normal);
+}
+
+.hero-image-wrapper:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 35px rgba(0, 240, 255, 0.35);
+}
+
+.hero-image-wrapper::before {
+  content: '';
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
