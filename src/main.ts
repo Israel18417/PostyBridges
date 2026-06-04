@@ -1,4 +1,5 @@
 import './style.css'
+import { serviceData } from './serviceData'
 import type { ServiceDetails } from './serviceData'
 import type { LegalData } from './legalData'
 
@@ -42,8 +43,7 @@ function getInstallationFee(serviceCount: number) {
 // ==========================================
 // DOM Elements Setup & Event Handlers
 // ==========================================
-document.addEventListener('DOMContentLoaded', async () => {
-  const { serviceData } = await import('./serviceData');
+document.addEventListener('DOMContentLoaded', () => {
   let cachedLegalData: LegalData | null = null;
   // Navigation & Scroll
   const header = document.getElementById('header');
