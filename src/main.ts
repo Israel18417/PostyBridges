@@ -226,6 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Auto-scroll testimonials every 6 seconds once the browser is idle and the slider is visible.
     let autoScroll = 0;
     let autoScrollTimeout = 0;
+    let userHasInteracted = false;
 
     const startAutoScroll = () => {
       if (autoScroll) return;
@@ -233,6 +234,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const stopAutoScroll = () => {
+      if (autoScrollTimeout) {
+        clearTimeout(autoScrollTimeout);
+        autoScrollTimeout = 0;
+      }
       if (autoScroll) {
         clearInterval(autoScroll);
         autoScroll = 0;
@@ -240,6 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const scheduleAutoScroll = () => {
+      if (!userHasInteracted) return;
       if (autoScrollTimeout) {
         clearTimeout(autoScrollTimeout);
       }
@@ -250,6 +256,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }, 7000);
     };
+
+    const activateInteractions = () => {
+      if (userHasInteracted) return;
+      userHasInteracted = true;
+      
+      // Clean up event listeners
+      window.removeEventListener('pointerdown', activateInteractions);
+      window.removeEventListener('keydown', activateInteractions);
+      window.removeEventListener('touchstart', activateInteractions);
+      window.removeEventListener('pointermove', activateInteractions);
+      
+      // Start auto-scroll if it is currently intersecting
+      const sliderRect = testimonialsSlider?.getBoundingClientRect();
+      if (sliderRect && sliderRect.top < window.innerHeight && sliderRect.bottom > 0) {
+        scheduleAutoScroll();
+      }
+    };
+
+    window.addEventListener('pointerdown', activateInteractions, { passive: true });
+    window.addEventListener('keydown', activateInteractions, { passive: true });
+    window.addEventListener('touchstart', activateInteractions, { passive: true });
+    window.addEventListener('pointermove', activateInteractions, { passive: true });
 
     // Reset auto-scroll timer on manual navigation
     [prevBtn, nextBtn].forEach(btn => {
