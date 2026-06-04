@@ -82,6 +82,33 @@ document.addEventListener('DOMContentLoaded', async () => {
   const legalModal = document.getElementById('legal-modal');
   const closeLegalModalBtn = document.getElementById('close-legal-modal');
   const legalModalBody = document.getElementById('legal-modal-body');
+  let lastFocusedElement: HTMLElement | null = null;
+
+  const setMenuOpen = (isOpen: boolean) => {
+    navLinksList?.classList.toggle('active', isOpen);
+    hamburger?.classList.toggle('open', isOpen);
+    hamburger?.setAttribute('aria-expanded', String(isOpen));
+    hamburger?.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+  };
+
+  const openModal = (modal: HTMLElement | null) => {
+    if (!modal) return;
+    lastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    modal.removeAttribute('aria-hidden');
+    modal.classList.add('active');
+    const dialog = modal.querySelector<HTMLElement>('.modal-content');
+    dialog?.focus({ preventScroll: true });
+  };
+
+  const closeModal = (modal: HTMLElement | null) => {
+    if (!modal) return;
+    const wasActive = modal.classList.contains('active');
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
+    if (wasActive) {
+      lastFocusedElement?.focus({ preventScroll: true });
+    }
+  };
 
   // Header Scroll Effect
   const sections = ['hero', 'services', 'estimator', 'why-us', 'faq', 'contact'];
@@ -124,15 +151,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Mobile Menu Toggle
   hamburger?.addEventListener('click', () => {
-    navLinksList?.classList.toggle('active');
-    hamburger.classList.toggle('open');
+    setMenuOpen(!navLinksList?.classList.contains('active'));
   });
 
   // Close Mobile Menu on Link Click
   navLinks.forEach(link => {
     link.addEventListener('click', () => {
-      navLinksList?.classList.remove('active');
-      hamburger?.classList.remove('open');
+      setMenuOpen(false);
     });
   });
 
@@ -144,8 +169,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       !navLinksList.contains(target) &&
       !hamburger?.contains(target)
     ) {
-      navLinksList.classList.remove('active');
-      hamburger?.classList.remove('open');
+      setMenuOpen(false);
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      setMenuOpen(false);
+      closeModal(serviceModal);
+      closeModal(bookingModal);
+      closeModal(legalModal);
     }
   });
 
@@ -254,18 +287,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     // FAQ Accordion Controls
     // ==========================================
     const faqItems = document.querySelectorAll('.faq-item');
-  faqItems.forEach(item => {
-    const question = item.querySelector('.faq-question');
-    question?.addEventListener('click', () => {
-      const isActive = item.classList.contains('active');
-      // Close all open FAQs
-      faqItems.forEach(faq => faq.classList.remove('active'));
-      // Toggle current
-      if (!isActive) {
-        item.classList.add('active');
-      }
+    faqItems.forEach(item => {
+      const question = item.querySelector<HTMLButtonElement>('.faq-question');
+      const answer = item.querySelector<HTMLElement>('.faq-answer');
+      question?.addEventListener('click', () => {
+        const isActive = item.classList.contains('active');
+        faqItems.forEach(faq => {
+          faq.classList.remove('active');
+          faq.querySelector<HTMLButtonElement>('.faq-question')?.setAttribute('aria-expanded', 'false');
+          const faqAnswer = faq.querySelector<HTMLElement>('.faq-answer');
+          if (faqAnswer) {
+            faqAnswer.hidden = true;
+          }
+        });
+        if (!isActive) {
+          item.classList.add('active');
+          question.setAttribute('aria-expanded', 'true');
+          if (answer) {
+            answer.hidden = false;
+          }
+        }
+      });
     });
-  });
 
   // ==========================================
   // Interactive Service Details Modal
@@ -298,7 +341,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     serviceModalBody.innerHTML = `
-      <h3>${details.name}</h3>
+      <h3 id="service-modal-title">${details.name}</h3>
       <div class="modal-subtitle">${details.tagline}</div>
       <p class="modal-desc">${details.description}</p>
       
@@ -328,14 +371,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
       
       <div class="modal-actions">
-        <button class="btn-primary" id="btn-select-in-estimator" data-service="${details.id}" style="width:100%; justify-content:center;">
+        <button class="btn-primary" id="btn-select-in-estimator" type="button" data-service="${details.id}" style="width:100%; justify-content:center;">
           Select This Upgrade in Cost Estimator
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         </button>
       </div>
     `;
 
-    serviceModal.classList.add('active');
+    openModal(serviceModal);
 
     // Add event handler inside the newly rendered modal body
     document.getElementById('btn-select-in-estimator')?.addEventListener('click', (e) => {
@@ -363,7 +406,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         calculateEstimate();
         
         // Close modal and scroll
-        serviceModal.classList.remove('active');
+        closeModal(serviceModal);
         document.getElementById('estimator')?.scrollIntoView({ behavior: 'smooth' });
       }
     });
@@ -407,19 +450,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   closeServiceModalBtn?.addEventListener('click', () => {
-    serviceModal?.classList.remove('active');
+    closeModal(serviceModal);
   });
 
   // Click outside modal content to close
   window.addEventListener('click', (e) => {
     if (e.target === serviceModal) {
-      serviceModal?.classList.remove('active');
+      closeModal(serviceModal);
     }
     if (e.target === bookingModal) {
-      bookingModal?.classList.remove('active');
+      closeModal(bookingModal);
     }
     if (e.target === legalModal) {
-      legalModal?.classList.remove('active');
+      closeModal(legalModal);
     }
   });
 
@@ -565,15 +608,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (successTotal) successTotal.textContent = `₦${totalValStr}`;
 
     // Show success booking modal
-    bookingModal?.classList.add('active');
+    openModal(bookingModal);
   });
 
   closeBookingModalBtn?.addEventListener('click', () => {
-    bookingModal?.classList.remove('active');
+    closeModal(bookingModal);
   });
 
   btnCloseSuccess?.addEventListener('click', () => {
-    bookingModal?.classList.remove('active');
+    closeModal(bookingModal);
   });
 
   async function openLegalModal(legalKey: string) {
@@ -594,13 +637,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     legalModalBody.innerHTML = `
       <span class="section-tag">PostyBridges Legal</span>
-      <h3>${details.title}</h3>
+      <h3 id="legal-modal-title">${details.title}</h3>
       <p class="legal-updated">${details.updated}</p>
       <p class="modal-desc">${details.intro}</p>
       <div class="legal-sections">${sectionsHtml}</div>
       <p class="legal-note">This information is a practical customer summary, not a substitute for independent legal advice.</p>
     `;
-    legalModal.classList.add('active');
+    openModal(legalModal);
   }
 
   document.querySelectorAll('.legal-link').forEach(link => {
@@ -614,7 +657,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   closeLegalModalBtn?.addEventListener('click', () => {
-    legalModal?.classList.remove('active');
+    closeModal(legalModal);
   });
 
   // Check if form was just successfully submitted via redirect
@@ -714,6 +757,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (themeToggleLabel) {
       themeToggleLabel.textContent = theme === 'light' ? 'Dark mode' : 'Light mode';
     }
+    themeToggle?.setAttribute('aria-pressed', String(theme === 'light'));
+    themeToggle?.setAttribute('aria-label', theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
   };
 
   setThemeLabel(savedTheme);

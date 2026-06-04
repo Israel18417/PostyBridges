@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
-
 :root {
   /* Theme Colors */
   --bg-primary: #06070a;
@@ -109,12 +107,40 @@ html {
   scrollbar-color: var(--accent-cyan) var(--bg-primary);
 }
 
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 body {
   font-family: var(--font-body);
   background-color: var(--bg-primary);
   color: var(--text-primary);
   overflow-x: hidden;
   line-height: 1.6;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent-cyan);
+  outline-offset: 4px;
+}
+
+.service-link:focus-visible,
+.footer-col a:focus-visible,
+.footer-bottom-links a:focus-visible,
+.contact-card-text a:focus-visible,
+.social-btn:focus-visible {
+  border-radius: 8px;
 }
 
 /* Scrollbar customization */
@@ -449,6 +475,11 @@ section {
   padding: 100px 24px;
   max-width: 1200px;
   margin: 0 auto;
+}
+
+section:not(.hero-section) {
+  content-visibility: auto;
+  contain-intrinsic-size: 900px;
 }
 
 .section-header {
