@@ -1,4 +1,6 @@
 /* Safari/cross-browser: Google Fonts loaded via HTML <link> */
+/* Font-display: swap is requested via the Google Fonts URL (&display=swap) */
+/* These fallback stacks prevent invisible text while fonts load (FOIT) */
 :root {
   /* Theme Colors */
   --bg-primary: #06070a;
@@ -210,10 +212,18 @@ p {
   width: 400px;
   height: 400px;
   border-radius: 50%;
-  filter: blur(150px);
+  /* Reduced from 150px — lower radius is exponentially cheaper on GPU */
+  filter: blur(80px);
   pointer-events: none;
   z-index: 0;
   opacity: 0.15;
+  /* CSS containment: prevent glow repaints from triggering full-page reflow */
+  contain: strict;
+  /* Promote to its own compositor layer — avoids repainting other layers */
+  will-change: opacity;
+  /* Disable subpixel rendering for blurred elements */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 .glow-cyan {
@@ -228,6 +238,13 @@ p {
   right: 5%;
 }
 
+/* Disable expensive glows entirely on small/low-end screens */
+@media (max-width: 768px) {
+  .glow-bg {
+    display: none;
+  }
+}
+
 /* Header & Navigation */
 header {
   position: fixed;
@@ -236,10 +253,14 @@ header {
   width: 100%;
   z-index: 1000;
   background: var(--glass-bg);
-  backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--glass-border);
   transition: var(--transition-normal);
+  /* Promote to its own GPU layer — prevents scroll from triggering header repaint */
+  will-change: transform;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 header.scrolled {
@@ -611,6 +632,10 @@ section:not(.hero-section) {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 240, 255, 0.15);
   border: 1px solid var(--glass-border);
   transition: box-shadow var(--transition-normal);
+  /* Promote image wrapper to GPU layer to avoid composite repaints */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: box-shadow;
 }
 
 .hero-image-wrapper:hover {
@@ -633,6 +658,8 @@ section:not(.hero-section) {
   height: auto;
   display: block;
   transition: var(--transition-slow);
+  /* GPU-accelerated transform for the zoom hover effect */
+  will-change: transform;
 }
 
 .hero-image-wrapper:hover .hero-image {
@@ -709,6 +736,8 @@ section:not(.hero-section) {
   display: flex;
   flex-direction: column;
   height: 100%;
+  /* Contain layout so card animations don't cause full-page reflow */
+  contain: layout style;
 }
 
 .service-card::before {
