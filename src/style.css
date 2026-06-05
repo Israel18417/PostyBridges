@@ -1,3 +1,4 @@
+/* Safari/cross-browser: Google Fonts loaded via HTML <link> */
 :root {
   /* Theme Colors */
   --bg-primary: #06070a;
@@ -103,8 +104,11 @@ body, header, .service-card, .stats-card, .testimonial-card, .estimator-board, .
 
 html {
   scroll-behavior: smooth;
-  scrollbar-width: thin;
-  scrollbar-color: var(--accent-cyan) var(--bg-primary);
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: var(--accent-cyan) var(--bg-primary); /* Firefox */
+  /* Safari: Use -webkit-overflow-scrolling for momentum scrolling */
+  -webkit-text-size-adjust: 100%; /* Prevent font scaling on orientation change in iOS */
+  text-size-adjust: 100%;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -133,6 +137,15 @@ body {
 :focus-visible {
   outline: 3px solid var(--accent-cyan);
   outline-offset: 4px;
+  /* Safari fallback for :focus-visible */
+}
+
+/* Safari focus fallback */
+@supports not selector(:focus-visible) {
+  :focus {
+    outline: 3px solid var(--accent-cyan);
+    outline-offset: 4px;
+  }
 }
 
 .service-link:focus-visible,
@@ -178,16 +191,18 @@ p {
 .text-gradient {
   background: linear-gradient(135deg, #0057c7 0%, #15d9ff 45%, #9f3cff 100%);
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: 0 2px 18px rgba(0, 85, 188, 0.22);
+  -webkit-text-fill-color: transparent;
+  color: transparent; /* Fallback for browsers that don't support -webkit-text-fill-color */
+  text-shadow: none; /* text-shadow doesn't apply with -webkit-text-fill-color */
 }
 
 .text-gradient-cyan {
   background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 .glow-bg {
@@ -478,8 +493,7 @@ section {
 }
 
 section:not(.hero-section) {
-  content-visibility: auto;
-  contain-intrinsic-size: 900px;
+  /* content-visibility: auto removed — poor Safari support */
 }
 
 .section-header {
@@ -506,12 +520,17 @@ section:not(.hero-section) {
 
 /* Hero Section */
 .hero-section {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
   align-items: center;
   justify-items: start;
   gap: 48px;
-  min-height: 100vh;
+  min-height: 100vh; /* Fallback */
+  min-height: -webkit-fill-available; /* iOS Safari 11.3- workaround */
+  min-height: 100dvh; /* Modern: dynamic viewport height (Chrome 108+, Safari 15.4+, FF 101+) */
   padding-top: 140px;
 }
 
@@ -1031,8 +1050,34 @@ section:not(.hero-section) {
   width: 18px;
   height: 18px;
   border-radius: 4px;
-  accent-color: var(--accent-cyan);
+  accent-color: var(--accent-cyan); /* Modern browsers */
+  /* Safari <15.4 fallback — custom checkbox appearance */
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255,255,255,0.05);
+  border: 2px solid var(--glass-border);
   cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.checklist-item input:checked {
+  background: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+}
+
+.checklist-item input:checked::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  width: 5px;
+  height: 9px;
+  border: 2px solid var(--bg-primary);
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg);
 }
 
 .checklist-item-info {
@@ -1847,17 +1892,24 @@ footer {
     top: 0;
     right: -100%;
     width: 290px;
-    height: 100vh;
+    height: 100vh; /* Fallback */
+    height: -webkit-fill-available;
+    height: 100dvh;
     background: rgba(8, 9, 15, 0.98);
-    backdrop-filter: blur(28px);
     -webkit-backdrop-filter: blur(28px);
+    backdrop-filter: blur(28px);
     box-shadow: -12px 0 50px rgba(0, 0, 0, 0.75);
     border-left: 1px solid rgba(0, 240, 255, 0.1);
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
     flex-direction: column;
     padding: 110px 20px 40px;
     gap: 8px;
     transition: var(--transition-normal);
     z-index: 999;
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
   }
   
   .nav-links.active {

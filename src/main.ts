@@ -4,6 +4,36 @@ import type { ServiceDetails } from './serviceData'
 import type { LegalData } from './legalData'
 
 // ==========================================
+// Safari-compatible smooth scroll helper
+// scrollIntoView({ behavior: 'smooth' }) only supported in Safari 15.4+
+// ==========================================
+function smoothScrollTo(el: HTMLElement | null) {
+  if (!el) return;
+  // Check for native smooth scroll support
+  const supportsNativeSmooth = 'scrollBehavior' in document.documentElement.style;
+  if (supportsNativeSmooth) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else {
+    // Polyfill: manual easing scroll for Safari <15.4
+    const targetY = el.getBoundingClientRect().top + window.pageYOffset - 80;
+    const startY = window.pageYOffset;
+    const diff = targetY - startY;
+    let start: number | null = null;
+    const duration = 600;
+    function step(timestamp: number) {
+      if (!start) start = timestamp;
+      const elapsed = timestamp - start;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease in-out cubic
+      const ease = progress < 0.5 ? 4 * progress ** 3 : 1 - (-2 * progress + 2) ** 3 / 2;
+      window.scrollTo(0, startY + diff * ease);
+      if (elapsed < duration) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+}
+
+// ==========================================
 // Cost Estimator System Variables & Calculations
 // ==========================================
 let selectedVehicle = 'sedan';
@@ -185,16 +215,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // Smooth scroll buttons
   document.getElementById('btn-explore')?.addEventListener('click', (e) => {
     e.preventDefault();
-    document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+    smoothScrollTo(document.getElementById('services'));
   });
 
   document.getElementById('btn-estimate')?.addEventListener('click', (e) => {
     e.preventDefault();
-    document.getElementById('estimator')?.scrollIntoView({ behavior: 'smooth' });
+    smoothScrollTo(document.getElementById('estimator'));
   });
 
   document.getElementById('btn-header-quote')?.addEventListener('click', () => {
-    document.getElementById('estimator')?.scrollIntoView({ behavior: 'smooth' });
+    smoothScrollTo(document.getElementById('estimator'));
   });
 
   const setupHeavyInteractions = () => {
@@ -435,7 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Close modal and scroll
         closeModal(serviceModal);
-        document.getElementById('estimator')?.scrollIntoView({ behavior: 'smooth' });
+        smoothScrollTo(document.getElementById('estimator'));
       }
     });
   }
