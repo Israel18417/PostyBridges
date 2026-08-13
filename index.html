@@ -112,15 +112,30 @@
         animation: loading-progress 1.8s infinite linear;
         border-radius: 4px;
       }
-      @keyframes pulse-glow {
-        0%, 100% {
-          transform: scale(1);
-          filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.3));
+      @keyframes car-drive {
+        0% {
+          transform: translate(0, 0) rotate(0deg);
+        }
+        25% {
+          transform: translate(50px, -50px) rotate(90deg);
         }
         50% {
-          transform: scale(1.04);
-          filter: drop-shadow(0 0 24px rgba(157, 78, 221, 0.5));
+          transform: translate(0, -100px) rotate(180deg);
         }
+        75% {
+          transform: translate(-50px, -50px) rotate(270deg);
+        }
+        100% {
+          transform: translate(0, 0) rotate(360deg);
+        }
+      }
+      @keyframes wheel-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      @keyframes road-flow {
+        0% { stroke-dashoffset: 0; }
+        100% { stroke-dashoffset: -200; }
       }
       @keyframes loading-progress {
         0% { transform: translateX(-100%); }
@@ -134,27 +149,56 @@
     <div id="preloader">
       <div class="preloader-content">
         <div class="preloader-logo">
-          <!-- A high-end geometric automotive radar / electronic node SVG -->
-          <svg class="preloader-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <!-- Pulsing outer hexagonal network -->
-            <polygon points="50,6 88,28 88,72 50,94 12,72 12,28" stroke="url(#preloader-grad-1)" stroke-width="2" stroke-dasharray="6 3" />
-            <!-- Inner smooth solid hexagon -->
-            <polygon points="50,15 80,32 80,68 50,85 20,68 20,32" stroke="url(#preloader-grad-2)" stroke-width="3" fill="rgba(6, 7, 10, 0.8)" />
-            <!-- Centered electronics pulse dot and radiating lines -->
-            <circle cx="50" cy="50" r="8" fill="url(#preloader-grad-1)" />
-            <line x1="50" y1="15" x2="50" y2="42" stroke="url(#preloader-grad-1)" stroke-width="2" stroke-linecap="round" />
-            <line x1="20" y1="68" x2="43" y2="55" stroke="url(#preloader-grad-2)" stroke-width="2" stroke-linecap="round" />
-            <line x1="80" y1="68" x2="57" y2="55" stroke="url(#preloader-grad-2)" stroke-width="2" stroke-linecap="round" />
+          <!-- Animated racing track with driving car -->
+          <svg class="preloader-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <linearGradient id="preloader-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <linearGradient id="car-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stop-color="#00f0ff" />
                 <stop offset="100%" stop-color="#9d4edd" />
               </linearGradient>
-              <linearGradient id="preloader-grad-2" x1="0%" y1="100%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#3a86c8" />
-                <stop offset="100%" stop-color="#00f0ff" />
+              <linearGradient id="track-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#1e293b" />
+                <stop offset="100%" stop-color="#0f172a" />
               </linearGradient>
             </defs>
+            
+            <!-- Outer track boundary -->
+            <circle cx="100" cy="100" r="85" fill="none" stroke="url(#track-gradient)" stroke-width="12" opacity="0.6" />
+            
+            <!-- Track road lines (animated) -->
+            <circle cx="100" cy="100" r="65" fill="none" stroke="url(#car-gradient)" stroke-width="2" stroke-dasharray="10,15" animation-name="road-flow" animation-duration="3s" animation-iteration-count="infinite" animation-timing-function="linear" stroke-dashoffset="0" />
+            
+            <!-- Animated car on the track -->
+            <g class="animated-car" style="animation: car-drive 4s linear infinite;">
+              <!-- Car body -->
+              <rect x="82" y="15" width="36" height="28" rx="6" fill="url(#car-gradient)" stroke="#00f0ff" stroke-width="2" />
+              
+              <!-- Windshield -->
+              <path d="M 88 20 L 92 15 L 108 15 L 112 20" fill="rgba(0, 240, 255, 0.3)" stroke="#00f0ff" stroke-width="1.5" />
+              
+              <!-- Rear windshield -->
+              <path d="M 88 38 L 85 43 L 115 43 L 112 38" fill="rgba(0, 240, 255, 0.2)" stroke="#9d4edd" stroke-width="1.5" />
+              
+              <!-- Front wheel (left) -->
+              <g transform="translate(88, 43)">
+                <circle cx="0" cy="0" r="6" fill="none" stroke="#00f0ff" stroke-width="2" style="animation: wheel-spin 0.8s linear infinite;" />
+                <circle cx="0" cy="0" r="3" fill="#9d4edd" />
+              </g>
+              
+              <!-- Front wheel (right) -->
+              <g transform="translate(112, 43)">
+                <circle cx="0" cy="0" r="6" fill="none" stroke="#00f0ff" stroke-width="2" style="animation: wheel-spin 0.8s linear infinite;" />
+                <circle cx="0" cy="0" r="3" fill="#9d4edd" />
+              </g>
+              
+              <!-- Motion blur effect -->
+              <line x1="75" y1="28" x2="65" y2="28" stroke="#00f0ff" stroke-width="2" opacity="0.4" stroke-linecap="round" />
+              <line x1="75" y1="35" x2="60" y2="35" stroke="#9d4edd" stroke-width="1.5" opacity="0.3" stroke-linecap="round" />
+            </g>
+            
+            <!-- Center circle with text hint -->
+            <circle cx="100" cy="100" r="25" fill="rgba(0, 240, 255, 0.05)" stroke="#00f0ff" stroke-width="1" stroke-dasharray="5,5" />
+            <text x="100" y="105" text-anchor="middle" font-size="8" fill="#9d4edd" opacity="0.6" font-family="monospace" font-weight="bold">RACING</text>
           </svg>
         </div>
         <div class="preloader-text">
