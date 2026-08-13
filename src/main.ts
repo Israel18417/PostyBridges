@@ -73,6 +73,42 @@ function getInstallationFee(serviceCount: number) {
 // ==========================================
 // DOM Elements Setup & Event Handlers
 // ==========================================
+// ==========================================
+// Preloader: fade out after page load + min timer
+// ==========================================
+(function setupPreloader() {
+  const preloader = document.getElementById('preloader');
+  if (!preloader) return;
+
+  let pageLoaded = false;
+  let timerDone = false;
+
+  function tryFadeOut() {
+    if (pageLoaded && timerDone && preloader) {
+      preloader.classList.add('fade-out');
+      // Remove from DOM after transition ends (0.6s)
+      preloader.addEventListener('transitionend', () => {
+        if (preloader) preloader.remove();
+      }, { once: true });
+      // Safety remove in case transitionend doesn't fire
+      setTimeout(() => {
+        if (preloader && preloader.parentNode) preloader.remove();
+      }, 900);
+    }
+  }
+
+  // Minimum display time: 1.4 s so the animation is always visible
+  setTimeout(() => {
+    timerDone = true;
+    tryFadeOut();
+  }, 1400);
+
+  window.addEventListener('load', () => {
+    pageLoaded = true;
+    tryFadeOut();
+  });
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
   let cachedLegalData: LegalData | null = null;
   // Navigation & Scroll
@@ -641,32 +677,136 @@ document.addEventListener('DOMContentLoaded', () => {
   // Carousel startup is handled inside setupHeavyInteractions.
 
   // ==========================================
-  // Booking Submission & Lock Price Trigger
+  // Booking: Two-Step Flow
+  // Step 1: Open modal with details form, pre-fill summary
+  // Step 2: Submit form → API → show success + ref code
   // ==========================================
+
+  // Elements for the two-step booking modal
+  const bookingFormStep = document.getElementById('booking-form-step');
+  const bookingSuccessStep = document.getElementById('booking-success-step');
+  const bookingFormElement = document.getElementById('booking-form-element') as HTMLFormElement | null;
+  const bookingFormStatus = document.getElementById('booking-form-status');
+  const bookingSummaryVehicleType = document.getElementById('booking-summary-vehicle-type');
+  const bookingSummaryServicesCount = document.getElementById('booking-summary-services-count');
+  const bookingSummaryTotal = document.getElementById('booking-summary-total');
+
+  // Store generated ref ID so the success screen can display it
+  let currentBookingRefId = '';
+
+  // Step 1: When user clicks "Submit Booking & Lock Price" in the estimator
   btnSubmitEstimate?.addEventListener('click', () => {
     if (selectedServices.size === 0) {
-      alert('Please check at least one vehicle upgrade integration service to estimate.');
+      alert('Please select at least one vehicle upgrade integration service to book.');
       return;
     }
 
-    // Generate simulated reference ID
-    const refId = `#PB-${Math.floor(1000 + Math.random() * 9000)}`;
-    const totalValStr = liveTotal ? liveTotal.textContent : '0';
-    const vehicleProfile = vehicleProfiles[selectedVehicle];
-    
-    // Populate variables inside success dialog modal
-    const successRef = document.getElementById('success-ref');
-    const successVehicle = document.getElementById('success-vehicle');
-    const successServicesCount = document.getElementById('success-services-count');
-    const successTotal = document.getElementById('success-total');
-    
-    if (successRef) successRef.textContent = refId;
-    if (successVehicle) successVehicle.textContent = vehicleProfile ? vehicleProfile.label : 'Sedan';
-    if (successServicesCount) successServicesCount.textContent = `${selectedServices.size} Service Upgrades`;
-    if (successTotal) successTotal.textContent = `₦${totalValStr}`;
+    // Generate booking ref
+    currentBookingRefId = `#PB-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    // Show success booking modal
+    // Pre-fill the summary panel inside the form step
+    const vehicleProfile = vehicleProfiles[selectedVehicle];
+    if (bookingSummaryVehicleType) {
+      bookingSummaryVehicleType.textContent = vehicleProfile ? vehicleProfile.label : 'Sedan / Coupe';
+    }
+    if (bookingSummaryServicesCount) {
+      bookingSummaryServicesCount.textContent = `${selectedServices.size} Service${selectedServices.size !== 1 ? 's' : ''} Selected`;
+    }
+    if (bookingSummaryTotal && liveTotal) {
+      bookingSummaryTotal.textContent = `₦${liveTotal.textContent}`;
+    }
+
+    // Reset to Step 1 (in case modal was previously at Step 2)
+    if (bookingFormStep) bookingFormStep.style.display = '';
+    if (bookingSuccessStep) bookingSuccessStep.style.display = 'none';
+    if (bookingFormElement) bookingFormElement.reset();
+    if (bookingFormStatus) {
+      bookingFormStatus.textContent = '';
+      bookingFormStatus.classList.remove('error', 'success');
+    }
+
     openModal(bookingModal);
+  });
+
+  // Step 2: Handle the booking details form submission
+  bookingFormElement?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const submitBtn = bookingFormElement.querySelector('button[type="submit"]') as HTMLButtonElement | null;
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite; vertical-align: middle; margin-right: 8px;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+        Submitting Booking...
+      `;
+    }
+
+    if (bookingFormStatus) {
+      bookingFormStatus.textContent = '';
+      bookingFormStatus.classList.remove('error', 'success');
+    }
+
+    try {
+      const formData = new FormData(bookingFormElement);
+      const vehicleProfile = vehicleProfiles[selectedVehicle];
+
+      // Collect service names for the backend email
+      const serviceNamesList = Array.from(selectedServices).map(key => {
+        return serviceData[key]?.name ?? key;
+      });
+
+      const payload = {
+        bookingCode: currentBookingRefId,
+        name: formData.get('name') as string,
+        email: formData.get('email') as string,
+        phone: formData.get('phone') as string,
+        vehicle: formData.get('vehicle') as string,
+        preferredDate: formData.get('preferredDate') as string,
+        selectedVehicleType: vehicleProfile ? vehicleProfile.label : selectedVehicle,
+        services: JSON.stringify(serviceNamesList),
+        totalPrice: liveTotal ? liveTotal.textContent ?? '0' : '0',
+      };
+
+      const response = await fetch('/api/booking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        throw new Error(errorBody.error || 'Booking submission failed. Please try again or call us directly.');
+      }
+
+      // Populate success screen
+      const successRef = document.getElementById('success-ref');
+      const successVehicle = document.getElementById('success-vehicle');
+      const successServicesCount = document.getElementById('success-services-count');
+      const successTotal = document.getElementById('success-total');
+
+      if (successRef) successRef.textContent = currentBookingRefId;
+      if (successVehicle) successVehicle.textContent = vehicleProfile ? vehicleProfile.label : 'Sedan / Coupe';
+      if (successServicesCount) successServicesCount.textContent = `${selectedServices.size} Service${selectedServices.size !== 1 ? 's' : ''} Selected`;
+      if (successTotal) successTotal.textContent = `₦${liveTotal ? liveTotal.textContent : '0'}`;
+
+      // Transition to Step 2
+      if (bookingFormStep) bookingFormStep.style.display = 'none';
+      if (bookingSuccessStep) bookingSuccessStep.style.display = '';
+
+    } catch (error) {
+      if (bookingFormStatus) {
+        bookingFormStatus.textContent = error instanceof Error
+          ? error.message
+          : 'Booking request failed. Please try again or call us directly.';
+        bookingFormStatus.classList.add('error');
+      }
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Confirm Booking & Lock Price';
+      }
+      console.error('Booking form submission failed:', error);
+    }
   });
 
   closeBookingModalBtn?.addEventListener('click', () => {
@@ -806,9 +946,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================
   const themeToggle = document.getElementById('theme-toggle');
   
-  // Check for saved theme preference, default to dark
-  const savedTheme = localStorage.getItem('theme') || 'dark';
-  document.documentElement.setAttribute('data-theme', savedTheme);
+  // Theme preference already set in <head> to avoid flash.
+  // Read it back for label sync.
+  const savedTheme = document.documentElement.getAttribute('data-theme') || 'dark';
 
   const themeToggleLabel = themeToggle?.querySelector('.toggle-text');
   const setThemeLabel = (theme: string) => {
